@@ -3,6 +3,7 @@
 | Date | Venue | City | Talk |
 |-|-|-|-|
 | 2014-08-08 | Scala by the Bay | San Francisco CA | [What's New since Programming in Scala](https://www.youtube.com/watch?v=JZ25N5KLfGM) |
+| 2014-11-15 | PNWScala         | Portland OR      | [What's New since Programming in Scala](https://www.youtube.com/watch?v=Mg56PCiPguw) |
 
 ## Meetups
 
