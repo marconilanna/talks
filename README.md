@@ -10,6 +10,7 @@
 | 2015-05-23 | Lambda Conf      | Boulder CO       | [Idiomatic Scala: Your Options Do Not Match](https://www.youtube.com/watch?v=ol2AB5UN1IA) |
 | 2015-06-09 | Scala Days       | Amsterdam, NL    | [What's New since Programming in Scala](https://www.parleys.com/tutorial/whats-new-since-programming-scala) |
 | 2015-08-15 | Scala by the Bay | San Francisco CA | Powerful and Elegant Scala One-Liners |
+| 2015-09-25 | Scala Up North   | Toronto, Canada  | [Powerful and Elegant Scala One-Liners](https://www.youtube.com/watch?v=V08s4AfVQY4) |
 
 ## Meetups
 

@@ -1,0 +1,1207 @@
+| \*Powerful and Elegant Scala One-Liners
+/
+
+| Marconi Lanna
+
+| Originate
+
+---
+
+Java can be painfully verbose.
+
+--
+
+A meager hello world takes 129 keystrokes.
+
+--
+
+125 if you indent with tabs.
+
+--
+
+It's the butt of all jokes.
+
+---
+
+Scala, with a powerful and flexible syntax, concise yet
+not terse, allows us to write much more expressive code.
+
+--
+
+A single line of Scala code can leverage
+an impressive amount of JVM power.
+
+---
+
+Let's see some of the most elegant and powerful Scala one-liners.
+
+--
+
+Using only language features and the standard library.
+
+--
+
+All examples tested with Scala 2.11.7 and Java 8u60.
+
+---
+
+| \rWarning
+
+--
+
+This is not code golf.
+
+--
+
+This is not about writing the shortest code possible.
+
+--
+
+Cryptic one-liners do not impress anyone.
+
+--
+
+Code responsibly, write for readability.
+
+---
+
+It was a lot of fun to put this talk together.
+
+I hope you have fun, too, and maybe even learn a trick or two.
+
+---
+
+| The ultimate Scala one-liner:
+
+--
+
+```
+case class Person(name: String, age: Int, deceased: Boolean)
+```
+
+---
+
+Seriously, case classes?
+
+--
+
+Who doesn't know about case classes?
+
+--
+
+Please, raise your hand who \*DOESN'T\s know about case classes?
+
+--
+
+Now raise your hand who knows, for sure,
+\*EVERYTHING\s a case class gives you?
+
+
+Every. Single. Thing.
+
+---
+
+There is no Scaladoc page for a hypothetical \*CaseClass\s trait.
+
+--
+
+As a matter of fact, the default Scaladoc page for a case class
+will not show you any of the compiler generated methods or
+even the companion object at all!
+
+--
+
+Even a simple case class with only a few parameters could take dozens
+of lines of Scala or even hundreds of lines of Java to write by hand.
+
+---
+
+| Everything a case class gives you
+
+--
+
+1. Getters: case classes are immutable by default, no setters.
+--
+
+2. Setters: if you really really really want them, use \*var\s.
+--
+
+3. Sane \*java.lang.Object\s methods: \*toString\s, \*equals\s, \*hashCode\s.
+--
+
+4. \*canEqual\s
+--
+
+5. The \*copy\s method, a better alternative to setters.
+--
+
+6. Serialization and deserialization: extends \*Serializable\s, \*readResolve\s
+--
+
+7. Extends \*Product\s: \*productArity\s, \*productElement\s, \*productIterator\s
+
+---
+
+Companion object:
+--
+
+1. \*apply\s factory method
+--
+
+2. \*unapply\s for pattern matching
+--
+
+3. \*curried\s and \*tupled\s methods
+
+--
+
+Downside:
+
+Case classes cannot be subclassed by other case classes.
+
+---
+
+| Let's see some examples
+
+```
+case class Person(name: String, age: Int, deceased: Boolean)
+```
+--
+
+```
+val jim = Person("Jim", 27, false)
+```
+--
+
+```
+jim.copy(age = jim.age + 1)
+```
+--
+
+```
+val a = jim.productElement(0)
+val b = jim.productElement(1)
+val c = jim.productElement(2)
+```
+--
+
+```
+jim.productIterator foreach println
+```
+
+---
+
+```
+val tuple = ("Jim", 27, false)
+
+Person.tupled(tuple)
+```
+--
+
+```
+val a = Person.curried
+val b = a("Jim")
+val c = b(27)
+val d = c(false)
+```
+--
+
+```
+Person.curried("Jim")(27)(true)
+```
+
+---
+
+| Extension methods on Java types
+
+---
+
+| Numeric types
+
+--
+
+```
+-1.abs
+```
+--
+
+```
+val max = 2 max 3
+val min = 2 min 3
+```
+--
+
+```
+val a = -5.signum
+val b = 0.signum
+val c = 7.signum
+```
+--
+
+```
+val a = 1 to 10
+val b = 1 until 10
+val c = 1 to 10 by 2
+```
+
+---
+
+| Float & Double
+
+--
+
+```
+val a = 2.5.ceil
+val b = 2.5.floor
+val c = 2.4.round
+val d = 2.6.toInt
+```
+--
+
+```
+val a = math.Pi.toDegrees
+val b = 180.toRadians
+val c = 180.0.toRadians
+```
+--
+
+```
+val a = 1.0.isValidInt
+val b = 1.1.isValidInt
+val c = 9999999999.0.isValidInt
+val d = 9999999999.0.isWhole
+val e = 2e256.isWhole
+```
+
+---
+
+| Char
+
+--
+
+```
+val a = 'a'.isDigit
+val b = 'a'.isLetter
+val c ='#'.isLetterOrDigit
+```
+--
+
+```
+val a = 'a'.isLower
+val b = 'A'.isUpper
+```
+--
+
+```
+val a = 'A'.toLower
+val b = 'a'.toUpper
+```
+--
+
+```
+val a = ' '.isWhitespace
+val b = '\t'.isWhitespace
+val c = '\n'.isWhitespace
+val d = '*'.isWhitespace
+```
+--
+
+Ranges:
+
+```
+val a = 'a' to 'z'
+val b = 'a' to 'z' by 4
+```
+
+---
+
+| String
+
+--
+
+```
+">-<" * 15
+```
+--
+
+```
+"hello world".capitalize
+```
+--
+
+```
+"hello" compareToIgnoreCase "HELLO"
+```
+--
+
+Multi-line strings:
+
+```
+"""hello world
+hallo welt
+bonjour le monde
+hola mundo
+ciao mondo
+""".lines.toList
+```
+---
+
+In Scala, \*String\s is a collection of \*Char\s.
+
+Most Scala collection methods are supported:
+
+```
+val a = "abc" map (_.toUpper)
+val b = "abc" forall (_.isLower)
+val c = "abc" exists (_.isDigit)
+```
+
+---
+
+| Array
+
+--
+
+```
+val a = Array(1, 2, 3) // this is Java int[]
+```
+--
+
+Arrays, too, support most Scala collection methods.
+--
+
+```
+val b = a map (2 *)
+val c = a.sum
+```
+
+---
+
+| Collections
+--
+
+Most Java collections can be decorated with Scala interfaces:
+--
+
+\*java.lang.Iterable
+\*java.util.Collection
+\*java.util.Dictionary
+\*java.util.Enumeration
+\*java.util.Iterator
+\*java.util.List
+\*java.util.Map
+\*java.util.Set
+\*java.util.concurrent.ConcurrentMap
+--
+
+```
+import scala.collection.JavaConverters._
+
+// System.getenv returns java.util.Map[String,String]
+System.getenv.asScala filterKeys (_ contains "JAVA") mkString "\n"
+```
+
+---
+
+| Idioms common to most collection types
+
+--
+
+```
+// Pascal's triangle 6th row
+val pascal = Seq(1, 6, 15, 20, 15, 6, 1)
+```
+--
+
+```
+pascal map (n => n * 2)
+```
+--
+
+```
+pascal map (_ * 2)
+```
+--
+
+```
+val a = pascal map (2 *)
+val b = pascal map 2.*
+```
+---
+
+To sum all elements:
+
+```
+pascal reduce (_ + _)
+```
+--
+
+```
+pascal.sum
+```
+--
+
+```
+pascal.product
+```
+
+---
+
+```
+def isEven(i: Int) = i % 2 == 0
+```
+--
+
+```
+pascal exists isEven
+```
+--
+
+```
+pascal forall isEven
+```
+--
+
+```
+pascal count isEven
+```
+--
+
+```
+pascal find isEven
+```
+
+---
+
+| Filtering and grouping
+
+--
+
+```
+val even = pascal filter isEven
+val odd = pascal filterNot isEven
+```
+--
+
+```
+val (even, odd) = pascal partition isEven
+```
+--
+
+```
+pascal groupBy (_ % 3) mkString "\n"
+```
+--
+
+```
+val a = pascal takeWhile (_ < 20)
+val b = pascal dropWhile (_ < 20)
+```
+--
+
+```
+pascal span (_ < 20)
+```
+--
+
+```
+pascal prefixLength (_ < 20)
+```
+
+---
+
+```
+pascal contains 20
+```
+--
+
+```
+val a = pascal indexOf 15
+val b = pascal lastIndexOf 15
+```
+--
+
+```
+val a = pascal indexWhere isEven
+val b = pascal lastIndexWhere isEven
+```
+--
+
+```
+val a = pascal startsWith Seq(1, 6, 15)
+val b = pascal endsWith Seq(6, 1)
+```
+--
+
+```
+val a = pascal containsSlice Seq(20, 15)
+val b = pascal indexOfSlice Seq(20, 15)
+```
+
+---
+
+```
+val max = pascal.max
+val min = pascal.min
+```
+--
+
+```
+val people = Seq(
+  Person("Roger", 72, false),
+  Person("Nick", 71, false),
+  Person("Richard", 65, true),
+  Person("Syd", 60, true),
+  Person("David", 69, false))
+
+people maxBy (_.age)
+```
+
+---
+
+```
+pascal.sorted
+```
+--
+
+```
+people sortBy (_.age)
+```
+--
+
+```
+pascal sortWith (_ > _)
+```
+
+---
+
+```
+Seq(1, 2, 3).reverse
+```
+--
+
+```
+Seq(1, 2, 3) reverseMap (2 *)
+```
+
+---
+
+```
+pascal.grouped(3).toList
+```
+--
+
+```
+pascal.sliding(3).toList
+```
+
+--
+/
+
+Find the first three consecutive elements whose sum is greater than 40:
+
+```
+pascal.sliding(3) find (_.sum > 40)
+```
+
+---
+
+```
+pascal mkString ", "
+```
+--
+
+```
+pascal.mkString("{", "} {", "}")
+```
+
+---
+
+```
+pascal intersect Seq(3, 14, 15, 92, 6, 5)
+```
+--
+
+```
+pascal diff Seq(2, 3, 6)
+```
+--
+
+```
+Set(1, 2, 3) union Set(4, 3, 1, 5)
+```
+--
+
+```
+Set(5, 2) subsetOf Set(1, 2, 3, 4, 5)
+```
+--
+
+```
+Set(1, 2, 3).subsets.toList mkString "\n"
+```
+--
+
+```
+Set(1, 2, 3, 4).subsets(2).toList mkString "\n"
+```
+
+---
+
+```
+pascal.combinations(2).toList mkString "\n"
+```
+--
+
+```
+Seq(1, 2, 3).permutations.toList mkString "\n"
+```
+--
+
+```
+pascal.distinct
+```
+
+---
+
+```
+val a = Seq(1, 2, 3)
+val b = Seq(4, 7, 5)
+
+(a corresponds b)(_ < _)
+```
+
+--
+/
+
+Transposing
+
+```
+Seq(Seq(1, 2, 3), Seq(4, 5, 6)).transpose mkString "\n"
+```
+
+--
+/
+
+```
+val a = pascal lift 0
+val b = pascal lift 2
+val c = pascal lift 10
+```
+
+---
+
+| Parallel Collections
+
+--
+
+Behaves exactly like sequential collections, except operations
+are transparently performed in parallel using all CPU cores.
+--
+
+```
+val par = pascal.par
+
+val a = par.sum
+val b = par map (2 *)
+```
+--
+
+```
+pascal.par foreach println
+```
+
+---
+
+| Maps
+
+--
+
+```
+val languages = Seq("Scala", "Java", "Swift").zipWithIndex.toMap
+```
+--
+
+```
+val a = languages.getOrElse("Swift", -1)
+val b = languages.getOrElse("Haskell", -1)
+```
+--
+
+```
+languages filterKeys (_ startsWith "S")
+```
+--
+
+```
+languages mapValues (10 +)
+```
+
+---
+
+| Poor man's cache
+
+```
+import scala.collection.mutable
+
+val cache = mutable.Map[String, String]()
+
+val a = cache.getOrElseUpdate("A", "ant")
+val b = cache.getOrElseUpdate("B", "bee")
+val c = cache.getOrElseUpdate("C", "cat")
+val d = cache.getOrElseUpdate("B", "bug")
+val e = cache("B")
+```
+
+---
+
+| Putting it all together
+
+---
+
+```
+val pangram = "The quick brown fox jumps over the lazy dog"
+```
+
+--
+/
+
+Does it really have all letters?
+
+```
+'a' to 'z' forall (pangram.contains(_))
+```
+
+--
+/
+
+I won’t believe it until I see it myself:
+
+```
+pangram.distinct.sorted
+```
+
+---
+
+| How many times each letter appears?
+
+--
+
+Grouping:
+
+```
+pangram groupBy (_.toLower)
+```
+
+--
+/
+
+Computing frequency:
+
+```
+pangram groupBy (_.toLower) mapValues (_.size)
+```
+
+--
+/
+
+Removing white space (and let's save what we've done so far):
+
+```
+val m = pangram filter (_.isLetter) groupBy (_.toLower) mapValues (_.size)
+```
+
+---
+
+Sorting by frequency:
+
+```
+m.toSeq sortBy (_._2)
+```
+
+--
+/
+
+Most frequent first:
+
+```
+m.toSeq sortWith (_._2 > _._2)
+```
+
+--
+/
+
+Only the letters that appear more than once:
+
+```
+m.filter(_._2 > 1).toSeq sortWith (_._2 > _._2) mkString "\n"
+```
+
+---
+
+All worlds with the letter 'o'
+
+```
+(pangram split " ") filter (_ contains 'o')
+```
+
+--
+/
+
+All strings that contain at least one of a set of keywords
+
+```
+val a = Seq("Swift is a lot like Scala", "Java 9 delayed",
+  "Scala takes over the world")
+
+a filter { s =>
+  Set("Scala", "Swift") exists s.contains
+}
+```
+
+---
+
+| Plotting a horizontal chart
+
+--
+
+```
+pascal map ("#" * _) mkString "\n"
+```
+
+--
+/
+
+With value labels:
+
+```
+pascal map (i => f"$i%3d: " + "#" * i) foreach println
+```
+
+---
+
+| Plotting a vertical chart
+
+--
+
+```
+for (i <- pascal.max to pascal.min by -1)
+  println(f"$i%3d: " + pascal.map(p => if (p==i) "*" else " ").mkString)
+```
+
+--
+/
+
+A bar chart. Can you spot the differnce?
+
+```
+for (i <- pascal.max to pascal.min by -1)
+  println(f"$i%3d: " + pascal.map(p => if (p>=i) "#" else " ").mkString)
+```
+
+---
+
+With negative numbers:
+
+```
+def plot(a: Int*): Unit =
+  for (i <- a.max to (0 min a.min) by -1; s = i.signum) println {
+    f"$i%3d: " + a.map(p => if (p * s >= i * s) "#" else " ").mkString
+  }
+
+plot((for (i <- 0 to 75) yield (12 * math.sin(i/12.0)).round.toInt): _*)
+```
+
+--
+/
+
+```
+plot((for (i <- 0 to 75) yield (12 * math.cos(i/12.0)).round.toInt): _*)
+```
+
+---
+
+| Extension methods
+
+--
+
+```
+implicit class IntOps(val n: Int) extends AnyVal {
+  def stars = "*" * n
+}
+
+5.stars
+```
+
+--
+/
+
+```
+implicit class StrOps(val s: String) extends AnyVal {
+  def isBlank = s.trim.isEmpty
+}
+
+"  \t \n ".isBlank
+```
+
+---
+
+Reading the contents of a file:
+
+```
+io.Source.fromFile("simpsons.txt").mkString
+```
+
+--
+/
+
+Processing a file line by line:
+
+```
+val lines = io.Source.fromFile("simpsons.txt").getLines.toList
+```
+
+---
+
+Line numbers:
+
+```
+lines.zipWithIndex.foreach {
+  case (l, i) => println(f"${i+1}%2d: $l")
+}
+```
+
+--
+/
+
+Selecting a line at random:
+
+```
+lines(util.Random.nextInt(lines.size))
+```
+
+---
+
+Fetching a file from the web:
+
+```
+io.Source.fromURL("https://github.com/humans.txt").take(335).mkString
+```
+
+--
+/
+
+Reading the news:
+
+```
+val news = xml.XML.load("https://news.google.com/?q=scala&output=rss")
+```
+
+--
+/
+
+We are humans, not robots:
+
+```
+news \\ "item" \ "title" map (_.text) mkString "\n"
+```
+
+---
+
+| Importing instance members
+
+--
+
+```
+{
+  import jim._
+  s"$name: $age"
+}
+```
+
+---
+
+| There is method in my randomness. Plenty, actually.
+
+--
+
+```
+import util.Random
+for (_ <- 1 to 5) println(Random.nextInt)
+```
+--
+
+```
+for (_ <- 1 to 5) println(Random.nextDouble)
+```
+--
+
+Normally (Gaussian) distributed value with mean 0.0 and std dev 1.0:
+
+```
+for (_ <- 1 to 5) println(Random.nextGaussian)
+```
+--
+
+```
+for (_ <- 1 to 5) println(Random.nextBoolean)
+```
+--
+
+```
+for (_ <- 1 to 5) println(Random.nextPrintableChar)
+```
+--
+
+```
+for (_ <- 1 to 5) println(Random.nextString(10))
+```
+--
+
+```
+for (_ <- 1 to 5) println(Random.alphanumeric.take(10).mkString)
+```
+--
+
+```
+for (_ <- 1 to 5) println(Random.shuffle(Seq(1, 2, 3, 4)))
+```
+
+---
+
+| Colors!
+
+```
+import Console.{RED, GREEN, BLUE}
+
+println(s"$RED red $GREEN green $BLUE blue")
+```
+
+---
+
+| Preconditions
+
+--
+
+```
+case class Person(name: String, age: Int) {
+  require(name.trim.nonEmpty, "name cannot be empty")
+  require(age >= 0, "age cannot be negative")
+  require(age <= 130, "oldest unambiguously documented human was 122")
+}
+```
+--
+
+```
+Person(" \t  ", 1)
+```
+--
+
+```
+Person("Bob", -1)
+```
+
+---
+
+| Regular expressions
+
+--
+
+Regexes are easy to define in Scala, just add \*.r\s to a string.
+Use triple quotes to avoid escaping all backslashes:
+
+```
+val date = """(\d\d\d\d)-(\d\d)-(\d\d)""".r
+```
+
+--
+/
+
+Extracting groups when a regex matches is even cooler:
+
+```
+val date(year, month, day) = "2015-08-15"
+```
+
+---
+
+Parsing numbers
+
+--
+
+```
+val (hex, oct, dec) = ("^0x[\\da-fA-F]+$".r, "^0\\d+$".r, "^\\d+$".r)
+
+def parse(s: String): Int = s match {
+  case hex(_*) => Integer.parseInt(s.drop(2), 16)
+  case oct(_*) => Integer.parseInt(s.drop(1), 8)
+  case dec(_*) => s.toInt
+}
+```
+--
+
+```
+val a = parse("0x42")
+val b = parse("042")
+val c = parse("42")
+```
+
+---
+
+| Running system processes
+
+--
+
+```
+import scala.sys.process._
+"ls".!
+```
+
+--
+/
+
+Capturing the output:
+
+```
+val output = "ls".!!
+```
+
+---
+
+| Getting fancy
+
+```
+def find(s: String) = "ls" #| s"grep $s" #|| "echo not found" lines
+
+val scala = find(".scala").mkString
+val java = find(".java").mkString
+```
+
+---
+
+| \gReferences
+
+github.com/marconilanna/talks
+
+--
+
+If you liked this talk, you may also like from the same author:
+
+"Idiomatic Scala: Your Options Do Not Match"
+
+blog.originate.com/blog/2014/06/15/idiomatic-scala-your-options-do-not-match/
+
+blog.originate.com
+--
+
+/
+
+| github.com/marconilanna/REPLesent
+--
+
+/
+
+| Thank you!
+--
+
+| Questions?
