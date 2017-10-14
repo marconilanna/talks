@@ -12,6 +12,7 @@
 | 2015-08-15 | Scala by the Bay | San Francisco CA | Powerful and Elegant Scala One-Liners |
 | 2015-09-25 | Scala Up North   | Toronto, Canada  | [Powerful and Elegant Scala One-Liners](https://www.youtube.com/watch?v=V08s4AfVQY4) |
 | 2015-11-14 | Full Stack       | Toronto, Canada  | [Powerful and Elegant Scala One-Liners](https://www.youtube.com/watch?v=LE4f9tVwzIY) |
+| 2015-12-10 | Scala eXchange   | London, UK       | [Idiomatic Scala: Your Options Do Not Match](https://skillsmatter.com/skillscasts/7040-lightning-talks-4) |
 
 ## Meetups
 
