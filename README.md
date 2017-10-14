@@ -8,6 +8,7 @@
 | 2015-03-17 | Scala Days       | San Francisco CA | [Anatomy of a Modern Play Application](https://www.parleys.com/tutorial/anatomy-modern-play-application) |
 | 2015-05-23 | Lambda Conf      | Boulder CO       | [What's New since Programming in Scala](https://www.youtube.com/watch?v=nVXxBAfriII) |
 | 2015-05-23 | Lambda Conf      | Boulder CO       | [Idiomatic Scala: Your Options Do Not Match](https://www.youtube.com/watch?v=ol2AB5UN1IA) |
+| 2015-06-09 | Scala Days       | Amsterdam, NL    | [What's New since Programming in Scala](https://www.parleys.com/tutorial/whats-new-since-programming-scala) |
 
 ## Meetups
 
