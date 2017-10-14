@@ -1,0 +1,43 @@
+@*
+ * Copyright 2013 Marconi Lanna
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@(title      : String=""
+, siteName   : String="Site Name"
+, description: String=""
+, id         : String=""
+, _class     : String=""
+)(content: Html)
+
+<!DOCTYPE html>
+<title>@if(title){@title - }@siteName</title>
+@if(description){<meta name="description" content="@description">}
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+@css("bootstrap-2.3.1")
+@css("font-awesome-3.0.2")
+<!--[if IE 7]>@css("font-awesome-ie7-3.0.2")<![endif]-->
+
+<body@if(id){ id="@id"}@if(_class){ class="@_class"}>
+@content
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery||document.write('<script src="@js.url("jquery-1.9.1")"><\/script>')</script>
+@js("bootstrap-2.3.1")
+<script>
+var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']]
+;(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0]
+g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js'
+s.parentNode.insertBefore(g,s)}(document,'script'))
+</script>
