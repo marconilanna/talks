@@ -19,3 +19,5 @@
 | Date | Venue | City | Talk |
 |-|-|-|-|
 | 2013-03-19 | Toronto Scala User Group | Toronto | Abnorm: A better non-ORM |
+| 2016-02-04 | Scala Toronto            | Toronto | Idiomatic Scala: Your Options Do Not Match |
+| 2016-02-04 | Scala Toronto            | Toronto | F-Bounded Polymorphism |

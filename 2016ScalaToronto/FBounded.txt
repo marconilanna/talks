@@ -1,0 +1,447 @@
+| \*F-Bounded Polymorphism
+| \*Recursive Type Signatures in Scala
+/
+
+| Marconi Lanna
+
+| Originate
+
+Based on content by Andrew Mohrland
+
+
+
+| Originally presented at:
+
+| \rNE Scala Boston, MA 2015
+
+---
+
+:snowflake:  :snowman:  :snowflake:  :snowman:  :snowflake:  :snowman:  :snowflake:
+
+--
+
+:airplane:  :airplane:  :airplane:  :airplane:  :airplane:  :airplane:  :airplane:
+
+---
+
+Have you ever seen a type signature like this before?
+
+```
+                 trait T[U <: T[U]]
+```
+
+---
+
+Heck, even Java 5 in 2004 had them:
+
+```
+public abstract class Enum<E extends Enum<E>>
+```
+
+---
+
+\*F-bounded polymorphism
+
+--
+
+Self-referential types
+
+--
+
+Recursive type signatures
+
+--
+
+Recursively bounded quantification
+
+---
+
+"In type theory, bounded quantification (also bounded polymorphism or
+constrained genericity) refers to universal or existential quantifiers
+which are restricted ("bounded") to range only over the subtypes of a
+particular type.
+
+Bounded quantification is an interaction of parametric polymorphism
+with subtyping.
+
+We speak of F-bounded quantification if the subtype constraint itself
+is parametrized by one of the binders occurring on the left-hand side"
+
+> Wikipedia
+
+---
+
+A powerful object-oriented technique that leverages
+the type system to encode constraints on generics.
+
+---
+
+"[...] those strongly typed systems are not really that powerful!
+The real power of static typing doesn't come from being able to make
+sure we don't mix strings and integers, but in doing type checking
+for much more complex abstractions."
+> hibikir
+
+--
+
+"[...] it is better when you encode business logic into your type system."
+> zeckalpha
+
+
+Hacker News: https://news.ycombinator.com/item?id=10962469
+
+---
+
+Advanced compiler-enforced type semantics over classes and traits.
+
+--
+
+Enhanced type-safety.
+
+--
+
+Simplify and reduce the number of unit tests.
+
+---
+
+What the heck does it do?
+
+--
+
+Why not simply use \*trait T[U]\s?
+
+--
+
+Or maybe even just \*trait T\s?
+
+---
+
+Learning by example:
+
+--
+
+Suppose we have database entities with CRUD methods.
+
+---
+
+We could define them like this:
+
+--
+
+```
+class Apple {
+  def create(): Apple
+  def read(id: long): Option[Apple]
+  def update(f: Apple => Apple): Apple
+  def delete(id: Long): Unit
+}
+
+class Orange {
+  def create(): Orange
+  def read(id: Long): Option[Orange]
+  def update(f: Orange => Orange): Orange
+  def delete(id: Long): Unit
+}
+```
+
+---
+
+The classes look nearly identical.
+
+--
+
+New entities would expose the same CRUD methods.
+
+---
+
+Let's abstract it into a trait:
+
+--
+
+Starting simple.
+
+--
+
+```
+trait T
+```
+
+---
+
+```
+trait Entity {
+  def create(): Entity = ???
+  def read(id: Long): Option[Entity] = ???
+  def update(f: Entity => Entity): Entity = ???
+  def delete(id: Long): Unit = ???
+}
+
+class Apple extends Entity
+
+class Orange extends Entity
+```
+
+---
+
+Well, honestly, this sucks.
+
+--
+
+The method signatures do not fully express what we want.
+
+--
+
+Cannot ensure, for instance, that calling \*update\s
+on \*Apple\s actually returns an \*Apple\s.
+
+--
+
+As it is, it could return any \*Entity\s.
+
+--
+
+Even worse, a type cast would be required to do basically
+anything useful with our \*Apple\s.
+
+---
+
+Let's try again.
+
+--
+
+Adding a type parameter to our \*Entity\s trait.
+
+--
+
+```
+trait T[U]
+```
+
+---
+
+```
+trait Entity[E] {
+  def create(): E = ???
+  def read(id: Long): Option[E] = ???
+  def update(f: E => E): E = ???
+  def delete(id: Long): Unit = ???
+}
+
+class Apple extends Entity[Apple]
+
+class Orange extends Entity[Orange]
+```
+
+---
+
+It's better.
+
+--
+
+But still not good.
+
+--
+
+Types do not yet express exactly what we want.
+
+--
+
+Can you see the problem?
+
+---
+
+The problem is that \*Entity\s can be extend in unintended ways.
+
+--
+
+```
+class FlyingSaucer
+
+class Orange extends Entity[FlyingSaucer]
+```
+
+--
+
+\*Entity[E]\s does not restrict the type of \*E\s.
+
+--
+
+Anything can be used, without any compiler errors.
+
+:see_no_evil:  :speak_no_evil:  :hear_no_evil:
+
+---
+
+No bueno!
+
+--
+
+We want a big, fat compiler error if we try anything other than
+
+```
+class Orange extends Entity[Orange]
+```
+
+---
+
+How to ensure that \*E\s matches its class?
+
+---
+
+Type bounds!
+
+--
+
+```
+trait T[U <: T[U]]
+```
+
+---
+
+Let's try again.
+
+--
+
+```
+trait Entity[E <: Entity[E]]
+
+class Apple extends Entity[Apple]
+
+class Orange extends Entity[Orange]
+```
+
+---
+
+Better, much better.
+
+--
+
+We have now constrained \*E\s to be a subtype of \*Entity\s.
+
+--
+
+No more \*Orange\s extends \*FlyingSaucer\s.
+
+--
+
+```
+class Orange extends Entity[FlyingSaucer]
+```
+
+--
+
+:bomb:  :bomb:  :bomb:  :boom:
+
+---
+
+But there is still one last problem...
+
+--
+
+Can you guess what it is?
+
+--
+
+```
+class Orange extends Entity[Apple]
+```
+
+---
+
+It is not ensured that \*E\s matches its own type,
+only that it is a subclass of \*Entity\s.
+
+--
+
+Bummer :-(
+
+
+:poop:  :poop:  :poop:  :toilet:
+
+--
+
+The trait is still open for abuse.
+
+--
+
+Getting there...
+
+--
+
+We need a way to ensure that \*Orange\s extends \*Entity[Orange]\s.
+
+---
+
+Self types
+
+---
+
+Self types!
+
+---
+
+```
+trait Entity[E <: Entity[E]] { self: E => }
+```
+
+---
+
+The self type (\*self: E =>\s) ensures that any class
+that extends \*Entity[E]\s is itself of type \*E\s.
+
+--
+
+```
+class Apple extends Entity[Apple]
+```
+
+--
+
+Now, code like:
+
+```
+class Orange extends Entity[Apple]
+```
+
+will finally be rejected by the compiler.
+
+--
+
+/   :tada:
+
+---
+
+We can rest confident that our definition of \*Entity\s
+ensures that any subtype of \*Entity[E]\s is in fact an \*E\s.
+
+--
+
+Semantics we desire.
+
+--
+
+Compiler rejects any code in violation.
+
+---
+
+| \gReferences
+
+github.com/marconilanna/talks
+--
+
+blog.originate.com
+
+blog.originate.com/blog/2014/02/27/types-inside-types-in-scala/
+--
+
+/
+
+| Powered by \*http://github.com/marconilanna/REPLesent
+--
+
+/
+
+| Thank you!
+--
+
+| Questions?
