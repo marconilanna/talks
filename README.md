@@ -2,6 +2,7 @@
 
 | Date | Venue | City | Talk |
 |-|-|-|-|
+| 2014-08-08 | Scala by the Bay | San Francisco CA | [What's New since Programming in Scala](https://www.youtube.com/watch?v=JZ25N5KLfGM) |
 
 ## Meetups
 
