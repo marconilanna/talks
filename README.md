@@ -7,6 +7,7 @@
 | 2015-01-30 | NEScala          | Boston MA        | [F-Bounded Polymorphism](https://newcircle.com/s/post/1717/f_bounded_polymorphism_marconi_lanna_video) |
 | 2015-03-17 | Scala Days       | San Francisco CA | [Anatomy of a Modern Play Application](https://www.parleys.com/tutorial/anatomy-modern-play-application) |
 | 2015-05-23 | Lambda Conf      | Boulder CO       | [What's New since Programming in Scala](https://www.youtube.com/watch?v=nVXxBAfriII) |
+| 2015-05-23 | Lambda Conf      | Boulder CO       | [Idiomatic Scala: Your Options Do Not Match](https://www.youtube.com/watch?v=ol2AB5UN1IA) |
 
 ## Meetups
 
