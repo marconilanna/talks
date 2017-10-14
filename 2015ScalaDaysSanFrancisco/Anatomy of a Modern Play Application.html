@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>Anatomy of a Modern Play Application</title>
+<style>
+.inverse {
+  background: #272822;
+  color: #f7f8f2;
+  text-shadow: 0 0 20px #333;
+}
+.inverse h1 {
+  color: #a7a8a2;
+  font-size: 42px;
+}
+.inverse h2 {
+  font-size: 32px;
+}
+.inverse h3 {
+  font-size: 26px;
+}
+.column {
+  width: 50%;
+  float: left;
+}
+.remark-inline-code {
+  color: #f92672;
+}
+.remark-slide-number {
+  display: none;
+}
+a, a:visited {
+  color: #f92672;
+  text-decoration: none;
+}
+</style>
+<body>
+<textarea id='source'>
+layout:true
+class: inverse
+background-image: url(originate.png)
+
+---
+
+class: center, middle
+
+# Anatomy of a Modern<br>Play Application
+
+Marconi Lanna
+
+.originate[Originate]
+
+---
+
+class: center, middle
+
+Recollection of best practices and lessons we learned<br>
+successfully delivering multiple Scala + Play projects
+
+---
+
+# Layer by layer
+
+* Build and configuration
+* Model
+  * Persistence
+* Service
+* View
+* Unit testing
+* Alternatives
+
+---
+
+name: build
+
+# Build and configuration
+
+---
+
+template: build
+name: safer
+
+## Making Scala safer
+
+---
+
+template: safer
+
+"Toward a Safer Scala" - Leif Wickland
+
+---
+
+template: safer
+
+* Enable `scalac` warning and lint options
+
+---
+
+template: safer
+
+```scala
+scalacOptions ++= Seq(
+  // Emit warning for usages of deprecated APIs
+    "-deprecation"
+  // Emit warning for usages of features that should be imported explicitly
+  , "-feature"
+  // Enable additional warnings where generated code depends on assumptions
+  , "-unchecked"
+  // Fail the compilation if there are any warnings
+  , "-Xfatal-warnings"
+  // Enable or disable specific warnings
+  , "-Xlint:_"
+)
+```
+
+---
+
+template: safer
+
+```
+$ scalac -Xlint:help
+```
+
+Option | Description
+--|--
+`adapted-args` | Warn if an argument list is modified to match the receiver
+`by-name-right-associative` | By-name parameter of right associative operator
+`delayedinit-select` | Selecting member of `DelayedInit`
+`doc-detached` | A ScalaDoc comment appears to be detached from its element
+`inaccessible` | Warn about inaccessible types in method signatures
+`infer-any` | Warn when a type argument is inferred to be `Any`
+`missing-interpolator` | A string literal appears to be missing an interpolator id
+
+---
+
+template: safer
+
+Option | Description
+--|--
+`nullary-override` | Warn when non-nullary `def f()` overrides nullary `def f`
+`nullary-unit` | Warn when nullary methods return `Unit`
+`option-implicit` | `Option.apply` used implicit view
+`package-object-classes` | Class or object defined in package object
+`poly-implicit-overload` | Parameterized overloaded implicit methods are not visible as view bounds
+`private-shadow` | A private field (or class parameter) shadows a superclass field
+`type-parameter-shadow` | A local type parameter shadows a type already in scope
+`unsound-match` | Pattern match may not be typesafe
+
+---
+
+template: safer
+
+```scala
+scalacOptions ++= Seq(
+  // Do not adapt an argument list to match the receiver
+    "-Yno-adapted-args"
+  // Warn when dead code is identified
+  , "-Ywarn-dead-code"
+  // Warn when local and private vals, vars, defs, and types are are unused
+  , "-Ywarn-unused"
+  // Warn when imports are unused
+  , "-Ywarn-unused-import"
+  // Warn when non-Unit expression results are unused
+  , "-Ywarn-value-discard"
+)
+```
+
+---
+
+template: safer
+
+### `-Yno-adapted-args`
+
+--
+
+```scala
+$ scala
+
+scala> List(1, 2, 3).toSet()
+```
+
+--
+
+```scala
+res0: Boolean = false
+```
+
+--
+
+```
+$ scala -Yno-adapted-args
+
+scala> List(1, 2, 3).toSet()
+error: not enough arguments for method apply: (elem: AnyVal)Boolean in trait GenSetLike.
+Unspecified value parameter elem.
+              List(1,2,3).toSet()
+                               ^
+```
+
+---
+
+template: safer
+
+```scala
+scalacOptions ++= Seq(
+  // Specify character encoding used by source files
+    "-encoding", "UTF-8"
+  // Target platform for object files
+  , "-target:jvm-1.8"
+  // Turn on future language features
+  , "-Xfuture"
+  // Compile without importing scala.*, java.lang.*, or Predef
+  , "-Yno-imports"
+  // Compile without importing Predef
+  , "-Yno-predef"
+)
+```
+
+---
+
+template: safer
+
+* Enable `scalac` warning and lint options
+* Leverage static analysis tools
+
+---
+
+template: safer
+
+### WartRemover
+
+--
+
+ https://github.com/puffnfresh/wartremover
+
+--
+
+```scala
+addSbtPlugin("org.brianmckenna" % "sbt-wartremover" % "0.11")
+```
+
+--
+
+* Inferred `Any`, `Nothing`, `Product`, `Serializable`
+* `Option#get`
+* `List#head`, `List#tail`, etc. (throw exception if empty)
+* `null`
+* `return`
+* `throw`
+* `var`
+
+---
+
+template: safer
+
+* Enable `scalac` warning and lint options
+* Leverage static analysis tools
+* Enforce coding standards
+
+---
+
+template: safer
+
+### Scalastyle
+
+--
+
+Used by Martin Odersky Coursera classes
+
+--
+
+ http://scalastyle.org/
+
+--
+
+```scala
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.6.0")
+```
+
+---
+
+template: safer
+
+* Enable `scalac` warning and lint options
+* Leverage static analysis tools
+* Enforce coding standards
+* Automated code review, continuous static analysis
+
+---
+
+template: safer
+
+### Codacy
+
+--
+
+ http://codacy.com/
+
+---
+
+class: center, middle
+
+![](codacy.png)
+
+---
+
+class: center, middle
+
+![](codacy2.png)
+
+---
+
+template: build
+name: sbt
+
+## sbt options
+
+---
+
+template: sbt
+
+### Improved incremental compilation
+
+--
+
+sbt 0.13.2
+
+--
+
+```scala
+incOptions := incOptions.value.withNameHashing(true)
+```
+
+--
+
+* I've measured recompilation speed improvements from 25% to 80%
+--
+
+* The bigger the project, the better the improvement
+--
+
+* Your mileage may vary
+
+---
+
+template: sbt
+
+### Improved dependency management
+
+--
+
+sbt 0.13.7
+
+--
+
+```scala
+updateOptions := updateOptions.value.withCachedResolution(true)
+```
+
+---
+
+template: sbt
+
+### Dependency update
+
+--
+
+sbt-updates
+
+--
+
+Adds a `dependencyUpdates` sbt task that checks Maven repositories for dependency updates
+
+--
+
+ https://github.com/rtimush/sbt-updates
+
+--
+
+```scala
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.1.8")
+```
+
+---
+
+template: build
+name: hocon
+
+## Leveraging Typesafe Config HOCON
+
+--
+
+Typesafe Config is awesome. Really awesome.
+
+--
+
+ https://github.com/typesafehub/config
+
+---
+
+template: hocon
+
+### Type-safe Typesafe Config config object
+
+--
+
+Fail early, fail fast, fail often
+
+--
+
+```scala
+current.configuration.getString("auth.db.passwrod")
+```
+
+--
+
+Did you see the typo?!?
+
+---
+
+template: hocon
+
+```scala
+class Settings(config: Configuration) {
+  // Throw an exception at application initialization
+  // if a key is missing, as recommended by
+  // https://github.com/typesafehub/config#schemas-and-validation
+  private def string(key: String): String = config.getString(key).get
+  private def string(key: String, default: String): String =
+      config.getString(key) getOrElse default
+  // int, double, boolean...
+
+  object auth {
+    object db {
+      val login = string("auth.db.login")
+      val password = string("auth.db.password")
+    }
+  }
+
+  object mail {
+    val server = string("mail.server", "localhost")
+  }
+
+  val optional = config.getString("optional")
+}
+```
+
+---
+
+template: hocon
+
+```scala
+current.configuration.getString("auth.db.password")
+```
+
+--
+
+```scala
+settings.auth.db.password
+
+settings.mail.server
+
+settings.optional foreach { ... }
+```
+
+---
+
+template: hocon
+
+```scala
+class Resource(resource: String) {
+  private val config = ConfigFactory.parseFile(new File(resource))
+      .resolve(ConfigResolveOptions.noSystem)
+
+  def has(key: String): Boolean = cfg.hasPath(key)
+
+  def apply(key: String): Option[String] =
+    if (has(key)) Option(config.getString(key)) else None
+  // int, double, boolean...
+}
+```
+
+---
+
+name: model
+
+# Model
+
+--
+
+Where to put business logic?
+
+--
+
+Thin or fat model?
+
+--
+
+Martin Fowler
+
+--
+
+"Domain Model: An object model of the domain that incorporates both behavior and data."
+
+--
+
+ http://www.martinfowler.com/bliki/AnemicDomainModel.html
+
+--
+
+"[...] there is hardly any behavior on these objects, making them little more than bags of getters and setters."
+
+--
+
+"The fundamental horror of this anti-pattern is that it's so contrary to the basic idea of object-oriented design; which is to combine data and process together. The anemic domain model is really just a procedural style design."
+
+---
+
+template: model
+
+On the other hand...
+
+--
+
+God objects
+
+--
+
+Violate SOLID principles
+
+--
+
+Difficult to reason about
+
+--
+
+Difficult to debug
+
+--
+
+Difficult to unit test
+
+--
+
+Difficult to mock
+
+---
+
+template: model
+
+So, between a thin model or a fat model, why not have both?
+
+--
+
+In Scala, you can have your cake and eat it, too.
+
+---
+
+template: model
+
+Fat model (god object)
+
+```scala
+package model
+
+case class User(email: Email, password: Password) {
+  def authenticate(credentials: Credentials): Boolean = {
+    email == credentials.email && password == credentials.password
+  }
+}
+```
+
+--
+
+```scala
+user.authenticate(credentials)
+```
+
+---
+
+template: model
+
+Thin model, fat service
+
+```scala
+package model
+case class User(email: Email, password: Password)
+
+package service
+class UserService {
+  def authenticate(user: User, credentials: Credentials): Boolean = {
+    user.email == credentials.email &&
+      user.password == credentials.password
+  }
+}
+```
+
+--
+
+```scala
+userService.authenticate(user, credentials)
+```
+
+--
+
+A little verbose, less elegant
+
+---
+
+template: model
+
+```scala
+package model
+
+case class User(email: Email, password: Password) extends UserAuth
+
+trait UserAuth {
+  self: User =>
+
+  def authenticate(credentials: Credentials): Boolean = {
+    email == credentials.email && password == credentials.password
+  }
+}
+```
+
+--
+
+```scala
+user.authenticate(credentials)
+```
+
+--
+
+Same syntax as fat model for method signature, body, and  invocation
+
+--
+
+Single responsibility principle: use different traits and keep them small and easy to reason about.
+
+--
+
+Easy to mock:
+
+```scala
+val mockUser = new User(email, password) with UserAuthMock
+```
+
+---
+
+template: model
+
+Avoid "primitive" types (`Int`, `String`, `Date`, etc.)
+
+--
+
+Tiny types
+
+--
+
+Dick Wall: "Type Early, Type Often"
+
+ http://typesafe.com/blog/type-early-type-often
+
+--
+
+```scala
+case class Person(first: String, last: String,
+  address: String, age: Int, ssn: String)
+```
+
+--
+
+```scala
+case class Person(first: FirstName, last: LastName,
+  address: Address, age: Age, ssn: SSN)
+```
+
+--
+
+```scala
+case class FirstName(name: String)
+```
+
+--
+
+```scala
+case class Age(age: Int) extends AnyVal
+```
+
+---
+
+template: model
+
+`require`
+
+--
+
+```scala
+case class Person(name: String, age: Int) {
+  require(name.trim.nonEmpty)
+  require(age >= 0)
+  require(age <= 130)
+}
+```
+
+---
+
+template: model
+
+Email validator
+
+--
+
+```scala
+import org.apache.commons.validator.routines.EmailValidator
+
+case class Email(val email: String) {
+  require(EmailValidator.getInstance.isValid(email))
+}
+```
+
+---
+
+name: persistence
+
+# Persistence
+
+--
+
+0. Avoid Anorm
+--
+
+0. Avoid Anorm
+--
+
+0. Seriously, avoid Anorm
+
+---
+
+template: persistence
+
+"Using JDBC is a **pain** [...] using the JDBC API directly is **tedious** [...]<br>
+We provide a **simpler** API for JDBC."
+
+--
+
+Linus Torvalds: "I see Subversion as being the most pointless project ever. Its slogan was 'CVS done right'. There is no way to do CVS right."
+
+--
+
+There is no way to do JDBC right!
+
+--
+
+ Anorm: a **simpler** way to **pain** and **tedium**.
+
+---
+
+template: persistence
+
+Play's Computer Database sample app
+
+--
+
+To add a single field to a domain model, you have to update your code in 11 places.
+
+--
+
+The Anorm documentation page spends 11 paragraphs describing why type safety is not important.
+
+--
+
+Really?
+
+--
+
+ Anorm: the worse case of throwing out the baby with the bath water.
+
+--
+
+Not type-safe, not DRY, too verbose, full of boilerplate.
+
+---
+
+class: center, middle
+
+Dude, seriously, avoid Anorm
+
+---
+
+template: persistence
+
+When implementing model persistence, wrap your API with `Future`
+
+--
+
+```scala
+def get(id: Id[User]): User
+```
+
+--
+
+```scala
+def get(id: Id[User]): Future[User]
+```
+
+--
+
+Prepare yourself for non-blocking IO
+
+--
+
+`Future.successful`
+
+`scala.concurrent.blocking`
+
+---
+
+template: persistence
+name: sql
+
+No in-line SQL
+
+---
+
+class: center, middle
+
+![](externalize.png)
+
+---
+
+template: sql
+
+--
+
+0. Keep code minimal
+--
+
+0. Change without recompiling
+--
+
+0. Give it to third parties (DBA)
+--
+
+0. Different sets of queries for different databases
+
+---
+
+template: persistence
+
+How?
+
+--
+
+Typesafe Config!
+
+--
+
+```scala
+class Resource(resource: String) {
+  def apply(key: String): Option[String] = ...
+}
+```
+
+--
+
+```scala
+class Query(table: String) {
+  private val query = Resource("conf/query/" + table + ".sql")
+
+  def apply(q: String) = query(q).get
+}
+```
+
+--
+
+```
+val userQuery = Query("user")
+
+userQuery("findById")
+```
+
+---
+
+template: persistence
+
+`user.sql`
+
+```scala
+include "common.sql.conf"
+
+insert: """insert into user ..."""
+
+update: """update user set ..."""
+
+delete: """delete from user where id = {id}"""
+
+select: """select * from user"""
+
+findById: ${select}""" where id = {id}"""
+```
+
+---
+
+template: persistence
+
+`common.sql.conf`
+
+```scala
+unicode: "collate utf8mb4_unicode_ci"
+```
+
+---
+
+template: persistence
+
+MySQL
+
+```sql
+create database sample
+  charset utf8mb4
+  collate utf8mb4_bin;
+```
+
+---
+
+name: view
+
+# View
+
+--
+
+### Templates
+
+--
+
+Consider other template options
+
+--
+
+Twirl is not terrible.
+
+--
+
+Indeed, it has some pretty cool, unique features, like type safety.
+
+--
+
+ Problem: embed full Scala code
+
+--
+
+Logic in templates
+
+--
+
+Compilation time
+
+--
+
+ Syntax: sometimes things that look like they should work, don't.
+
+--
+
+ Scalate: Scala Template Engine
+
+ http://scalate.github.io/scalate/
+
+--
+
+Client-side rendering
+
+---
+
+template: view
+
+### Custom tags
+
+--
+
+Easy to define powerful custom tags
+
+--
+
+```html
+<link rel="stylesheet" media="screen"
+  href="@routes.Assets.at("stylesheets/main.css")">
+
+<link rel="shortcut icon" type="image/png"
+  href="@routes.Assets.at("images/favicon.png")">
+
+<script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")"
+  type="text/javascript"></script>
+```
+
+---
+
+template: view
+
+### Custom tags
+
+```scala
+sealed trait asset {
+  protected def folder: String
+  protected def ext = "." + folder
+  def url(resource: String) =
+    controllers.routes.Assets.at(s"$folder/$resource$ext").url
+}
+
+object css extends asset {
+  protected def folder = "css"
+  def apply(resource: String) =
+    Html(s"""<link href="${url(resource)}" rel="stylesheet">""")
+}
+
+object js extends asset {
+  protected def folder = "js"
+  def apply(resource: String) =
+    Html(s"""<script src="${url(resource)}"></script>""")
+}
+```
+
+---
+
+template: view
+
+### Custom tags
+
+```html
+<link rel="stylesheet" media="screen"
+  href="@routes.Assets.at("stylesheets/main.css")">
+
+<link rel="shortcut icon" type="image/png"
+  href="@routes.Assets.at("images/favicon.png")">
+
+<script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")"
+  type="text/javascript"></script>
+```
+
+--
+
+```scala
+@css("bootstrap-3.3.4")
+@js("jquery-2.1.3")
+@img("logo.png")
+```
+
+--
+
+Go crazy!
+
+---
+
+template: view
+
+### Advanced custom tags
+
+--
+
+```scala
+@if (user.isAuthorized) {
+  Welcome, @user.name!
+} else {
+  Nothing to see here...
+}
+```
+
+--
+
+Very tempting to litter the templates with business logic
+
+--
+
+```scala
+@if (user.isAuthorized && user.isPremiumSubscriber) { ...
+```
+
+---
+
+template: view
+
+### Advanced custom tags
+
+```scala
+// Extending NodeSeq is a little hack to prevent HTML double-escape
+class IfTag(condition: Boolean, content: => Html)
+  extends scala.xml.NodeSeq {
+
+  def theSeq = Nil // just ignore, required by NodeSeq
+
+  override def toString = if (condition) content.toString else ""
+
+  def orElse(failed: => Html) = if (condition) content else failed
+}
+```
+
+--
+
+```scala
+def isAuthorized(user: User)(body: => Html) =
+  new IfTag(user.isAuthorized, body)
+```
+
+--
+
+```scala
+@isAuthorized(user){
+  Welcome, @user.name!
+}.orElse{
+  Nothing to see here...
+}
+```
+
+---
+
+template: view
+
+### Asset pipeline
+
+--
+
+sbt-web
+
+--
+
+grunt/yeoman
+
+--
+
+gulp
+
+--
+
+Play-Yeoman
+
+ https://github.com/tuplejump/play-yeoman
+
+---
+
+template: view
+name: i18n
+
+### Internationalization
+
+--
+
+It is easier to do it from the start.
+
+--
+
+Useful even if your application is targeted at only one country and one language.
+
+---
+
+class: center, middle
+
+![](externalize.png)
+
+---
+
+template: i18n
+
+--
+
+0. Keep code minimal
+--
+
+0. Change without recompiling
+--
+
+0. Give it to third parties
+--
+
+0. Solve minor regional differences
+
+---
+
+template: i18n
+
+Localization files are written using the Typesafe Config HOCON format.
+
+--
+
+Messages are rendered by ICU4J (International Components for Unicode)
+
+--
+
+Headed by IBM and used by Adobe, Amazon, Apache, Apple, Eclipse, Google, Intel, Mozilla...
+
+--
+
+Compared to Java `MessageFormat`, ICU4J supports named arguments, enhanced genders and plurals, cardinal (one, two, five thousand) and ordinal (1st, 2nd, 3rd) numbers, user-friendly apostrophe quoting syntax, full Unicode support, and much more.
+
+--
+
+Drop-in replacement
+
+--
+
+ http://site.icu-project.org/
+
+--
+
+```scala
+"com.ibm.icu" % "icu4j" % "54.1.1"
+```
+
+---
+
+template: i18n
+
+Solve minor regional differences
+
+--
+
+```
+# messages.en-CA.conf
+
+include "messages.en.conf"
+
+state="province"
+zipCode="postal code"
+zipFormat="[a-zA-Z]\d[a-zA-Z] ?\d[a-zA-Z]\d"
+```
+
+---
+
+template: view
+
+## HTML input sanitization
+
+--
+
+jsoup
+
+--
+
+Parses HTML, not regex-based
+
+--
+
+Converts relative links to absolute
+
+--
+
+Filter tags and attributes
+
+--
+
+Custom whitelists
+
+--
+
+ http://jsoup.org/
+
+--
+
+```scala
+"org.jsoup" % "jsoup" % "1.8.1"
+```
+
+---
+
+name: service
+
+# Service
+
+--
+
+### `Future`-based service architecture
+
+--
+
+"Your Server as a Function" by Marius Eriksen, Twitter
+
+--
+
+ http://monkey.org/~marius/funsrv.pdf
+
+--
+
+```scala
+type Service[Req, Res] = Req => Future[Res]
+```
+
+---
+
+template: service
+
+### Do not throw exceptions
+
+--
+
+Exceptions are not functional!
+
+--
+
+Functions that throw exceptions are not total functions
+
+--
+
+They do not return a value for all possible inputs
+
+--
+
+Use `Try` instead
+
+--
+
+`Try` does for exceptions what `Option` does for `null`
+
+---
+
+# Unit testing
+
+--
+
+Prefer ScalaTest
+
+--
+
+ Mocking: ScalaMock, Mockito
+
+--
+
+Code coverage: Scoverage
+
+--
+
+Dependency Injection
+
+--
+
+Avoid the Cake Pattern and the Bakery of Doom
+
+--
+
+Implicit parameters, MacWire
+
+---
+
+# Alternatives
+
+--
+
+Not a criticism, but Play may not be always the best solution for all projects
+
+--
+
+Spray / Akka HTTP
+
+--
+
+Scalatra
+
+---
+
+# References
+
+* **[github.com/marconilanna/talks](https://github.com/marconilanna/talks)**
+* **[blog.originate.com](http://blog.originate.com/)**
+
+--
+
+Thank you!
+
+--
+
+Questions?
+
+Please share your experiences.
+
+</textarea>
+
+<script src='remark.js'></script>
+<script>
+var slideshow = remark.create({
+    highlightLanguage: 'scala'
+  , highlightStyle: 'monokai'
+})
+</script>
